@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kehidupan Seorang Astronot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Latar Belakang Bintang -->
+        <div class="stars-bg"></div>
+
+        <!-- 0. Landing Page -->
+        <section id="phase-landing" class="phase active">
+            <div class="glass-panel">
+                <h1 class="glow-text">Kehidupan Seorang Astronot</h1>
+                <p>Siap untuk menjelajahi luar angkasa?</p>
+                <button class="btn-primary" onclick="startAdventure()">Mulai Petualangan 🚀</button>
+            </div>
+        </section>
+
+        <!-- 1. Fase A: Persiapan -->
+        <section id="phase-a" class="phase hidden">
+            <!-- Bagian Latihan (awalnya tampil) -->
+            <div id="training-section" class="interactive-area flex-column w-100" style="flex-direction: column; justify-content: center;">
+                <div class="glass-panel top-info">
+                    <h2>Fase Persiapan: Latihan Fisik</h2>
+                    <p>Sebelum berangkat, astronot harus berlatih keras. Mereka berlatih di kolam air besar (NBL) untuk menyimulasikan gravitasi nol, dan di mesin sentrifugal untuk membiasakan diri dengan tekanan G-Force!</p>
+                </div>
+                <div class="cards-container" style="display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                    <div class="card" style="cursor: pointer; transition: transform 0.2s;" onclick="showActivity('swimming')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="assets/nbl_pool_kids.png" alt="Simulasi Air" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+                        <h3>Simulasi Air</h3>
+                        <p>Latihan berjam-jam di bawah air menggunakan baju astronot lengkap agar terbiasa dengan gaya berat angkat.</p>
+                        <p style="color: #F59E0B; font-size: 0.9em; margin-top: 10px; font-weight: bold;">▶ Klik untuk lihat video</p>
+                    </div>
+                    <div class="card" style="cursor: pointer; transition: transform 0.2s;" onclick="showActivity('centrifugal')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="assets/centrifuge_kids.png" alt="Sentrifugal" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;">
+                        <h3>Sentrifugal</h3>
+                        <p>Diputar dengan sangat cepat untuk menahan tekanan peluncuran roket.</p>
+                        <p style="color: #F59E0B; font-size: 0.9em; margin-top: 10px; font-weight: bold;">▶ Klik untuk lihat video</p>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="showDressUp()" style="margin-top: 30px;">Lanjut ke Pakaian Astronot</button>
+            </div>
+
+            <!-- Bagian Memakai Baju (awalnya sembunyi) -->
+            <div id="dressup-section" class="interactive-area hidden flex-column w-100" style="flex-direction: column; justify-content: center; width: 100%;">
+                <div class="glass-panel top-info">
+                    <h2>Fase Persiapan: Baju Astronot</h2>
+                    <p class="instruction-text">Tarik (Drag) Baju dan Helm ke Astronot untuk memakaikannya!</p>
+                </div>
+                
+                <div class="dressup-layout" style="display: flex; justify-content: space-around; width: 100%; max-width: 900px; align-items: center; margin-top: 20px;">
+                    <div class="astronaut-avatar" id="astronaut-avatar" ondragover="allowDrop(event)" ondrop="dropItem(event)">
+                        <img src="assets/astronaut_base_trans.png" alt="Astronot Dasar" class="base-avatar" style="z-index: 1;">
+                        <img src="assets/astronaut_suit_placed_85.png" alt="Baju" class="wearable worn hidden" id="worn-suit" style="z-index: 2;">
+                        <!-- Kepala ini selalu di atas baju agar tidak tertutup bagian belakang baju -->
+                        <img src="assets/astronaut_head_layered.png" alt="Kepala Overlay" class="head-overlay hidden" id="head-overlay" style="z-index: 3; pointer-events: none;">
+                        <img src="assets/astronaut_helmet_front_placed.png" alt="Helm" class="wearable worn hidden" id="worn-helmet" style="z-index: 4;">
+                    </div>
+                    
+                    <div class="equipment-panel">
+                        <div class="equip-item draggable-item" draggable="true" ondragstart="dragItem(event, 'suit')" id="item-suit">
+                            <div class="equip-img-wrap">
+                                <img src="assets/astronaut_suit_trans.png" alt="Baju Astronot">
+                            </div>
+                            <span>Badan (Space Suit)</span>
+                        </div>
+                        <div class="equip-item draggable-item" draggable="true" ondragstart="dragItem(event, 'helmet')" id="item-helmet">
+                            <div class="equip-img-wrap equip-img-helmet">
+                                <img src="assets/astronaut_helmet_front_trans.png" alt="Helm Astronot">
+                            </div>
+                            <span>Helm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-bar hidden" id="next-to-b" style="margin-top: 30px;">
+                    <button class="btn-primary" onclick="goToPhase('b')">Lanjut ke Peluncuran! 🚀</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Fase B: Peluncuran -->
+        <section id="phase-b" class="phase hidden">
+            <div class="glass-panel top-info">
+                <h2>Fase Peluncuran: Menuju Luar Angkasa</h2>
+                <p>Roket membutuhkan tenaga besar untuk melawan gravitasi Bumi. Saat meluncur, astronot merasakan tekanan kuat yang disebut G-Force.</p>
+                <p class="instruction-text" id="launch-instruction">Tarik roket ke atas untuk meluncurkannya!</p>
+            </div>
+
+            <div class="interactive-area launch-area">
+                <div class="countdown-display hidden" id="countdown">3</div>
+                <div class="rocket-container">
+                    <div class="launch-pad"></div>
+                    <img src="assets/rocket_new.png" alt="Roket" class="rocket-draggable" id="rocket" draggable="false">
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Fase C: Operasional -->
+        <section id="phase-c" class="phase hidden">
+            <div class="glass-panel top-info" style="position: absolute; top: 20px; z-index: 20;">
+                <h2>Fase Operasional: Hidup di Luar Angkasa</h2>
+                <p>Selamat datang di ISS! Gravitasi nol membuat semuanya melayang.</p>
+                <p class="instruction-text">Klik ikon yang melayang untuk melihat video kegiatannya!</p>
+            </div>
+
+            <!-- Area Melayang -->
+            <div class="space-station-area" style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                <div class="floating-astronaut" style="position: relative; width: 280px; height: 420px; z-index: 5;">
+                    <!-- Tubuh dasar disembunyikan agar lengannya tidak bocor, drop-shadow dipindah ke baju -->
+                    <img src="assets/astronaut_suit_placed_85.png" alt="Baju" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: contain; filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)); z-index: 2;">
+                    <!-- Kepala dihilangkan saat memakai helm sesuai permintaan -->
+                    <img src="assets/astronaut_helmet_front_placed.png" alt="Helm" class="floating-helmet" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; object-fit: contain; z-index: 4;">
+                </div>
+
+                <!-- Ikon-ikon Melayang -->
+                <div class="floating-icon icon-sleep" onclick="showActivity('sleep')">
+                    <span class="icon-emoji">🛏️</span>
+                    <span class="icon-label">Tidur</span>
+                </div>
+                <div class="floating-icon icon-eat" onclick="showActivity('eat')">
+                    <span class="icon-emoji">🍕</span>
+                    <span class="icon-label">Makan</span>
+                </div>
+                <div class="floating-icon icon-wash" onclick="showActivity('wash')">
+                    <span class="icon-emoji">🚿</span>
+                    <span class="icon-label">Mandi</span>
+                </div>
+                <div class="floating-icon icon-spacewalk" onclick="showActivity('spacewalk')">
+                    <span class="icon-emoji">🔧</span>
+                    <span class="icon-label">Spacewalk</span>
+                </div>
+                <div class="floating-icon icon-panoramic" onclick="showActivity('panoramic')">
+                    <span class="icon-emoji">🌍</span>
+                    <span class="icon-label">Bumi</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Modal Aktivitas dengan Video (Dipindah ke luar agar bisa diakses dari semua fase) -->
+        <div id="activity-modal" class="modal hidden">
+            <div class="modal-content glass-panel" style="max-width: 800px; width: 95%;">
+                <span class="close-btn" onclick="closeActivity()">&times;</span>
+                <h2 id="act-title">Judul Aktivitas</h2>
+                <div id="act-content" class="act-body" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <p id="act-desc"></p>
+                    <div class="video-container" id="video-container" style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sistem Audio -->
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSuccessSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playBeep(440, 'sine', 0.1);
+            setTimeout(() => playBeep(660, 'sine', 0.2), 100);
+            setTimeout(() => playBeep(880, 'sine', 0.3), 250);
+        }
+
+        let rumbleOsc, rumbleGain;
+        function startRumble() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            rumbleOsc = audioCtx.createOscillator();
+            rumbleGain = audioCtx.createGain();
+            rumbleOsc.type = 'sawtooth';
+            rumbleOsc.frequency.setValueAtTime(50, audioCtx.currentTime);
+            rumbleGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(100, audioCtx.currentTime);
+            rumbleOsc.connect(filter);
+            filter.connect(rumbleGain);
+            rumbleGain.connect(audioCtx.destination);
+            rumbleOsc.start();
+        }
+
+        function stopRumble() {
+            if (rumbleGain) {
+                rumbleGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+                setTimeout(() => rumbleOsc.stop(), 1000);
+            }
+        }
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

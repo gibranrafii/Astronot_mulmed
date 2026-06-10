@@ -1,0 +1,500 @@
+:root {
+    --primary: #4F46E5;
+    --primary-hover: #4338CA;
+    --accent: #F59E0B;
+    --text-main: #FFFFFF;
+    --glass-bg: rgba(25, 25, 45, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    font-family: 'Nunito', sans-serif;
+    background-color: #0B0B1A;
+    color: var(--text-main);
+    overflow: hidden;
+}
+
+h1, h2, h3 {
+    font-family: 'Fredoka One', cursive;
+    letter-spacing: 1px;
+}
+
+.glow-text {
+    font-size: 3rem;
+    text-shadow: 0 0 10px rgba(79, 70, 229, 0.8), 0 0 20px rgba(79, 70, 229, 0.5);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.app-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/space_bg.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stars-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat top center;
+    z-index: 0;
+    animation: move-twink-back 200s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes move-twink-back {
+    from {background-position: 0 0;}
+    to {background-position: -10000px 5000px;}
+}
+
+.phase {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+#phase-landing {
+    justify-content: center;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+    position: absolute !important;
+    z-index: -1 !important;
+}
+
+.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+    position: relative;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    max-width: 800px;
+    width: 100%;
+}
+
+.top-info {
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.top-info h2 {
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+
+.instruction-text {
+    color: #A78BFA;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-family: 'Fredoka One', cursive;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 20px;
+}
+
+.card {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+/* =============================================
+   FASE A: DRESS UP — PERBAIKAN PROPORSI
+   ============================================= */
+
+.interactive-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    flex: 1;
+}
+
+/* Avatar astronot — ukuran tetap 300x300 */
+.astronaut-avatar {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    transition: transform 0.3s, filter 0.3s;
+    flex-shrink: 0;
+}
+
+.astronaut-avatar.drag-over {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 20px rgba(167, 139, 250, 0.8));
+}
+
+/* Semua layer gambar di dalam avatar */
+.astronaut-avatar img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    object-fit: contain;
+    transition: opacity 0.3s;
+}
+
+/*
+ * PERBAIKAN UTAMA: Layer kepala (astronaut_head_layered.png) 
+ * adalah asset 1024x1024 full. Karena gambar kepala anak
+ * berada di bagian ATAS canvas, kita geser ke atas sedikit
+ * dan skalakan agar pas dengan proporsi badan.
+ *
+ * Sesuaikan nilai translateY jika asset Anda berbeda.
+ */
+.astronaut-avatar .head-overlay,
+.astronaut-avatar #worn-helmet,
+.floating-astronaut .head-overlay,
+.floating-astronaut .floating-helmet {
+    transform: scale(0.88) translateY(-4%);
+    transform-origin: center top;
+}
+
+/* Equipment Panel */
+.equipment-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+/* Kotak item equipment */
+.equip-item {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 12px;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    overflow: hidden; /* penting agar zoom tidak keluar kotak */
+}
+
+.equip-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+    border-color: var(--accent);
+}
+
+.equip-item.equipped {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(100%);
+}
+
+/* Wrapper gambar di dalam equip-item — clipping container */
+.equip-img-wrap {
+    width: 110px;
+    height: 110px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+}
+
+/* Gambar baju: asset astronaut_suit_trans.png */
+.equip-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/*
+ * Helm icon styling is no longer needed since we use the properly cropped transparent image.
+ */
+.equip-img-helmet {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.equip-img-helmet img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.equip-item span {
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+/* =============================================
+   FASE B: PELUNCURAN
+   ============================================= */
+
+.launch-area {
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 50px;
+}
+
+.rocket-container {
+    position: relative;
+    width: 300px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.launch-pad {
+    position: absolute;
+    bottom: 0;
+    width: 250px;
+    height: 20px;
+    background: #555;
+    border-radius: 10px;
+}
+
+.rocket-draggable {
+    width: 250px;
+    cursor: grab;
+    z-index: 5;
+    transition: transform 0.1s;
+    touch-action: none;
+    mix-blend-mode: screen;
+}
+
+.rocket-draggable:active {
+    cursor: grabbing;
+}
+
+.countdown-display {
+    font-size: 6rem;
+    font-family: 'Fredoka One', cursive;
+    color: var(--accent);
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+    z-index: 20;
+}
+
+.shake {
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+    0%   { transform: translate(1px, 1px) rotate(0deg); }
+    10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+    20%  { transform: translate(-3px, 0px) rotate(1deg); }
+    30%  { transform: translate(3px, 2px) rotate(0deg); }
+    40%  { transform: translate(1px, -1px) rotate(1deg); }
+    50%  { transform: translate(-1px, 2px) rotate(-1deg); }
+    60%  { transform: translate(-3px, 1px) rotate(0deg); }
+    70%  { transform: translate(3px, 1px) rotate(-1deg); }
+    80%  { transform: translate(-1px, -1px) rotate(1deg); }
+    90%  { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.flying {
+    transition: transform 2s ease-in !important;
+    transform: translateY(-1000px) !important;
+}
+
+/* =============================================
+   FASE C: OPERASIONAL
+   ============================================= */
+
+.floating-astronaut {
+    animation: float-anim 6s ease-in-out infinite;
+    background: transparent;
+}
+
+@keyframes float-anim {
+    0%   { transform: translateY(0px) rotate(0deg); }
+    33%  { transform: translateY(-20px) rotate(5deg); }
+    66%  { transform: translateY(10px) rotate(-3deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.floating-icon {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(25, 25, 45, 0.85);
+    backdrop-filter: blur(8px);
+    border: 3px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    animation: float-icon 4s ease-in-out infinite alternate, pulse-glow 2s infinite;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes pulse-glow {
+    0%   { box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    50%  { box-shadow: 0 0 20px rgba(255,255,255,0.6), inset 0 0 10px rgba(255,255,255,0.4); }
+    100% { box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+}
+
+.floating-icon:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.2) !important;
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.8), inset 0 0 15px rgba(245, 158, 11, 0.5);
+    z-index: 10;
+}
+
+.icon-emoji {
+    font-size: 2.5rem;
+}
+
+.icon-label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 3px black;
+    margin-top: 5px;
+}
+
+@keyframes float-icon {
+    0%   { transform: translateY(0px); }
+    100% { transform: translateY(-15px); }
+}
+
+.icon-sleep     { top: 18%; left: 12%; animation-delay: 0s; }
+.icon-eat       { top: 12%; right: 15%; animation-delay: 0.5s; }
+.icon-wash      { bottom: 25%; left: 12%; animation-delay: 1s; }
+.icon-spacewalk { bottom: 18%; right: 15%; animation-delay: 1.5s; }
+.icon-panoramic { top: 45%; right: 8%; animation-delay: 2s; }
+
+#phase-c {
+    background-image: url('assets/iss_bg_kids.png');
+    background-size: cover;
+    background-position: center;
+}
+
+/* =============================================
+   MODAL
+   ============================================= */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 600px;
+    width: 90%;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: white;
+}
+
+.act-body {
+    margin-top: 20px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.act-body img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    margin-top: 15px;
+}

@@ -326,17 +326,48 @@ h1, h2, h3 {
     border-radius: 10px;
 }
 
-.rocket-draggable {
+.rocket-wrapper {
+    position: relative;
     width: 250px;
+    height: 250px; /* Assuming 1:1 aspect ratio since original is 1024x1024 */
+}
+
+.rocket-draggable {
     cursor: grab;
     z-index: 5;
     transition: transform 0.1s;
     touch-action: none;
-    mix-blend-mode: screen;
 }
 
 .rocket-draggable:active {
     cursor: grabbing;
+}
+
+.rocket-body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    clip-path: polygon(0 0, 100% 0, 100% 65%, 0 65%);
+}
+
+.rocket-fire {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    animation: fire-flicker 0.15s infinite alternate;
+    transform-origin: 50% 65%;
+}
+
+@keyframes fire-flicker {
+    0% { transform: scale(1, 0.9); opacity: 0.8; filter: brightness(1) drop-shadow(0 0 10px #F59E0B); }
+    100% { transform: scale(1.05, 1.1); opacity: 1; filter: brightness(1.2) drop-shadow(0 0 20px #F59E0B); }
 }
 
 .countdown-display {
@@ -446,7 +477,7 @@ h1, h2, h3 {
 .icon-panoramic { top: 45%; right: 8%; animation-delay: 2s; }
 
 #phase-c {
-    background-image: url('assets/iss_bg_kids.png');
+    background-image: url('assets/iss_hd.png');
     background-size: cover;
     background-position: center;
 }

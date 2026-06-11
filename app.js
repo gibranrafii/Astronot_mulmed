@@ -24,6 +24,17 @@ function goToPhase(phase) {
     if (phase === 'b') {
         setupDragToLaunch();
     }
+    
+    // Putar backsound hanya saat di fase C
+    const bgMusic = document.getElementById('bg-music');
+    if (bgMusic) {
+        if (phase === 'c') {
+            bgMusic.play().catch(e => console.log('Audio autoplay blocked', e));
+        } else {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }
+    }
 }
 
 // --- Fase A: Persiapan ---
@@ -170,6 +181,12 @@ function startCountdown() {
     const cdDisplay = document.getElementById('countdown');
     cdDisplay.classList.remove('hidden');
     
+    // Tampilkan api roket saat countdown dimulai
+    const rocketFire = document.getElementById('rocket-fire');
+    if (rocketFire) {
+        rocketFire.classList.remove('hidden');
+    }
+    
     let count = 3;
     cdDisplay.innerText = count;
     playBeep(400, 'sine', 0.2); // beep
@@ -216,19 +233,19 @@ const activityData = {
         video: "https://www.youtube.com/embed/onm7P_iFueE"
     },
     wash: {
-        title: "Mandi Tanpa Gayung",
-        desc: "Karena air tidak jatuh ke bawah, astronot membersihkan diri menggunakan handuk basah dan sabun tanpa bilas.",
+        title: "Toilet Luar Angkasa",
+        desc: "Tanpa gravitasi, astronot menggunakan toilet khusus yang bekerja seperti penyedot debu (vacuum) untuk menghisap kotoran agar tidak melayang-layang di udara!",
         video: "https://www.youtube.com/embed/3VoeRAR0YgE"
     },
     spacewalk: {
         title: "Space Walk (EVA)",
         desc: "Terkadang astronot harus keluar dari ISS untuk memperbaiki satelit. Mereka diikat dengan tali pengaman agar tidak melayang jauh ke angkasa.",
-        video: "https://www.youtube.com/embed/SGP6Y0Pnhe4"
+        video: "https://www.youtube.com/embed/CC-z_aBAv6M"
     },
     panoramic: {
         title: "Pemandangan Bumi",
         desc: "Dari jarak 400 kilometer di atas Bumi, astronot bisa melihat lengkungan planet kita yang indah. Bumi terlihat dominan berwarna biru (air) dengan awan putih yang berputar.",
-        video: "https://www.youtube.com/embed/XqJBXXO5mG0"
+        video: "https://www.youtube.com/embed/uYpRRInfi80"
     },
     swimming: {
         title: "Latihan Simulasi Air",

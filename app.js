@@ -284,7 +284,7 @@ const activityData = {
     },
     centrifugal: {
         title: "Latihan Sentrifugal",
-        desc: "Siap-siap berputar super cepat! 🌀 Latihan sentrifugal ini menggunakan mesin berbentuk lengan raksasa yang memutar astronot dengan kecepatan sangat tinggi di dalam ruangan bulat. Putaran cepat ini menghasilkan gaya tekan yang sangat kuat, mirip dengan tekanan berat (G-Force) yang dirasakan dada astronot saat roket meluncur menembus langit. Latihan ini melatih jantung dan pernapasan astronot agar tetap sadar dan sehat meskipun tertindih tekanan yang berat!",
+        desc: "Latihan sentrifugal ini menggunakan mesin berbentuk lengan raksasa yang memutar astronot dengan kecepatan sangat tinggi di dalam ruangan bulat. Putaran cepat ini menghasilkan gaya tekan yang sangat kuat, mirip dengan tekanan berat (G-Force) yang dirasakan dada astronot saat roket meluncur menembus langit. Latihan ini melatih jantung dan pernapasan astronot agar tetap sadar dan sehat meskipun tertindih tekanan yang berat!",
         video: "https://www.youtube.com/embed/xJyBIUNlY2M",
         voice: "voice_over/sentrifugal.mp3"
     }

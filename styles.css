@@ -326,6 +326,53 @@ h1, h2, h3 {
     border-radius: 10px;
 }
 
+.drag-indicator {
+    position: absolute;
+    bottom: 270px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--accent);
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    z-index: 10;
+    pointer-events: none;
+    animation: bounce-up 1.5s infinite;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.drag-indicator .arrow-up {
+    width: 20px;
+    height: 20px;
+    border-left: 5px solid var(--accent);
+    border-top: 5px solid var(--accent);
+    transform: rotate(45deg);
+    margin-bottom: -10px;
+    animation: fade-up 1.5s infinite;
+    filter: drop-shadow(0 0 5px var(--accent));
+}
+
+.drag-indicator .arrow-up:nth-child(1) { animation-delay: 0s; }
+.drag-indicator .arrow-up:nth-child(2) { animation-delay: 0.2s; }
+.drag-indicator .arrow-up:nth-child(3) { animation-delay: 0.4s; }
+
+.drag-indicator span {
+    margin-top: 20px;
+}
+
+@keyframes bounce-up {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -15px); }
+}
+
+@keyframes fade-up {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
 .rocket-wrapper {
     position: relative;
     width: 250px;
@@ -363,6 +410,10 @@ h1, h2, h3 {
     clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
     animation: fire-flicker 0.15s infinite alternate;
     transform-origin: 50% 65%;
+}
+
+.rocket-fire.hidden {
+    display: none !important;
 }
 
 @keyframes fire-flicker {
@@ -528,4 +579,154 @@ h1, h2, h3 {
     max-height: 300px;
     border-radius: 10px;
     margin-top: 15px;
+}
+
+/* =============================================
+   TOAST NOTIFICATION
+   ============================================= */
+
+.toast {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px) scale(0.95);
+    background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    z-index: 1000;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    pointer-events: none;
+    text-align: center;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* =============================================
+   TOMBOL KONTROL AUDIO (MUTE/UNMUTE)
+   ============================================= */
+.audio-control-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(25, 25, 45, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.audio-control-btn.hidden-btn {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+    pointer-events: none;
+}
+
+.audio-control-btn:hover {
+    transform: scale(1.1);
+    background: rgba(25, 25, 45, 0.9);
+    border-color: var(--accent);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3), 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.audio-control-btn:active {
+    transform: scale(0.95);
+}
+
+.audio-control-btn svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.2s ease;
+}
+
+.audio-control-btn:hover svg {
+    transform: scale(1.05);
+}
+
+.audio-control-btn.muted {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #EF4444;
+}
+
+.audio-control-btn.muted:hover {
+    border-color: #EF4444;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3), 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+/* =============================================
+   TOMBOl VOICE OVER (TEXT-TO-SPEECH)
+   ============================================= */
+.btn-voice {
+    background: rgba(79, 70, 229, 0.25);
+    border: 1px solid rgba(79, 70, 229, 0.4);
+    color: var(--text-main);
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-family: 'Fredoka One', cursive; /* Agar sesuai tema tulisan judul */
+    letter-spacing: 0.5px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 15px auto 5px auto;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+}
+
+.btn-voice:hover {
+    background: rgba(79, 70, 229, 0.45);
+    border-color: rgba(79, 70, 229, 0.8);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.btn-voice:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.btn-voice.speaking {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #EF4444;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    animation: voice-pulse 1.5s infinite alternate;
+}
+
+.btn-voice.speaking:hover {
+    background: rgba(239, 68, 68, 0.45);
+    border-color: rgba(239, 68, 68, 0.8);
+}
+
+@keyframes voice-pulse {
+    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+    100% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6); }
+}
+
+.voice-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+}
+
+.btn-voice:hover .voice-icon {
+    transform: scale(1.1);
 }

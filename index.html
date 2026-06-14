@@ -8,9 +8,18 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="toast-notification" class="toast"></div>
     <div id="app" class="app-container">
         <!-- Latar Belakang Bintang -->
         <div class="stars-bg"></div>
+
+        <!-- Tombol Mute/Unmute Floating -->
+        <button id="mute-btn" class="audio-control-btn hidden-btn" onclick="toggleMute()" aria-label="Mute/Unmute Audio">
+            <svg id="mute-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+        </button>
 
         <!-- 0. Landing Page -->
         <section id="phase-landing" class="phase active">
@@ -96,6 +105,15 @@
                 <div class="countdown-display hidden" id="countdown">3</div>
                 <div class="rocket-container">
                     <div class="launch-pad"></div>
+                    
+                    <!-- Indikator Drag -->
+                    <div class="drag-indicator" id="drag-indicator">
+                        <div class="arrow-up"></div>
+                        <div class="arrow-up"></div>
+                        <div class="arrow-up"></div>
+                        <span>Drag ke Atas!</span>
+                    </div>
+
                     <div class="rocket-wrapper rocket-draggable" id="rocket" draggable="false">
                         <img src="assets/rocket_trans.png" alt="Roket Badan" class="rocket-body" draggable="false">
                         <img src="assets/rocket_trans.png" alt="Roket Api" class="rocket-fire hidden" id="rocket-fire" draggable="false">
@@ -151,6 +169,16 @@
             <div class="modal-content glass-panel" style="max-width: 800px; width: 95%;">
                 <span class="close-btn" onclick="closeActivity()">&times;</span>
                 <h2 id="act-title">Judul Aktivitas</h2>
+                
+                <!-- Tombol Voice Over Premium -->
+                <button id="voice-btn" class="btn-voice" onclick="handleVoiceOverClick()" aria-label="Dengarkan Penjelasan">
+                    <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                    <span id="voice-btn-text">Dengarkan Penjelasan</span>
+                </button>
+
                 <div id="act-content" class="act-body" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
                     <p id="act-desc"></p>
                     <div class="video-container" id="video-container" style="width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden;">
@@ -161,11 +189,173 @@
 
     </div>
 
+    <audio id="bg-music" src="assets/backsound.mp3" loop preload="auto"></audio>
+    <audio id="voice-audio" preload="auto"></audio>
+
     <!-- Sistem Audio -->
-    <audio id="bg-music" src="assets/backsound.mp3" loop></audio>
     <script>
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
+
+        // Master Volume Gain Node untuk Efek Suara (Beep & Rumble)
+        const masterGain = audioCtx.createGain();
+        masterGain.connect(audioCtx.destination);
+
+        const bgMusic = document.getElementById('bg-music');
+        const voiceAudio = document.getElementById('voice-audio');
+        
+        let isAdventureStarted = false;
+        let isMuted = false;
+        let isSpeaking = false;
+
+        // Pasang event listener untuk menangani UI dan volume secara dinamis
+        if (voiceAudio) {
+            voiceAudio.onplay = () => {
+                isSpeaking = true;
+                updateVoiceOverButtonUI(true);
+                // Turunkan volume musik latar (Audio Ducking) ke sangat kecil (0.05) saat voice over diputar
+                if (bgMusic && !isMuted) {
+                    bgMusic.volume = 0.05;
+                }
+            };
+
+            voiceAudio.onended = () => {
+                isSpeaking = false;
+                updateVoiceOverButtonUI(false);
+                // Kembalikan volume musik latar ke volume standar yang nyaman (0.25)
+                if (bgMusic && !isMuted) {
+                    bgMusic.volume = 0.25;
+                }
+            };
+
+            voiceAudio.onerror = () => {
+                isSpeaking = false;
+                updateVoiceOverButtonUI(false);
+                if (bgMusic && !isMuted) {
+                    bgMusic.volume = 0.25;
+                }
+            };
+        }
+
+        function playBgMusic() {
+            if (!bgMusic) return;
+            // Atur volume default backsound agar tidak terlalu keras (0.25 atau 25% volume)
+            bgMusic.volume = isMuted ? 0 : 0.25;
+            // Memulai pemutaran audio secara streaming
+            bgMusic.play().catch(e => console.error("Gagal memutar backsound:", e));
+        }
+
+        function stopBgMusic() {
+            if (!bgMusic) return;
+            bgMusic.pause();
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            
+            // Mute/unmute musik latar dan atur volumenya
+            if (bgMusic) {
+                bgMusic.muted = isMuted;
+                bgMusic.volume = isMuted ? 0 : (isSpeaking ? 0.05 : 0.25);
+            }
+            
+            // Mute/unmute voice over
+            if (voiceAudio) {
+                voiceAudio.muted = isMuted;
+            }
+            
+            // Mute/unmute efek suara sintesis
+            const targetVolume = isMuted ? 0 : 1;
+            masterGain.gain.setTargetAtTime(targetVolume, audioCtx.currentTime, 0.05);
+            
+            updateMuteButtonUI();
+        }
+
+        function updateMuteButtonUI() {
+            const btn = document.getElementById('mute-btn');
+            const iconContainer = document.getElementById('mute-icon');
+            if (!btn || !iconContainer) return;
+            
+            if (isMuted) {
+                btn.classList.add('muted');
+                iconContainer.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                `;
+            } else {
+                btn.classList.remove('muted');
+                iconContainer.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                `;
+            }
+        }
+
+        // --- Sistem Voice Over (Pra-rekam MP3) ---
+        window.currentVoicePath = "";
+
+        function handleVoiceOverClick() {
+            if (isSpeaking) {
+                stopVoiceOver();
+            } else {
+                startVoiceOver(window.currentVoicePath);
+            }
+        }
+
+        function startVoiceOver(voicePath) {
+            if (!voiceAudio || !voicePath) return;
+
+            // Hentikan pemutaran sebelumnya jika ada
+            voiceAudio.pause();
+            voiceAudio.currentTime = 0;
+
+            // Sesuaikan status mute dengan tombol mute utama
+            voiceAudio.muted = isMuted;
+
+            // Set sumber audio baru dan mulai putar
+            voiceAudio.src = voicePath;
+            voiceAudio.play().catch(e => console.error("Gagal memutar voice over:", e));
+        }
+
+        function stopVoiceOver() {
+            if (voiceAudio) {
+                voiceAudio.pause();
+                voiceAudio.currentTime = 0;
+            }
+            isSpeaking = false;
+            updateVoiceOverButtonUI(false);
+            // Kembalikan volume musik latar ke volume standar yang nyaman (0.25)
+            if (bgMusic && !isMuted) {
+                bgMusic.volume = 0.25;
+            }
+        }
+
+        function updateVoiceOverButtonUI(speaking) {
+            const btn = document.getElementById('voice-btn');
+            const textSpan = document.getElementById('voice-btn-text');
+            const iconContainer = btn ? btn.querySelector('svg') : null;
+            if (!btn || !textSpan) return;
+
+            if (speaking) {
+                btn.classList.add('speaking');
+                textSpan.innerText = "Hentikan Penjelasan";
+                if (iconContainer) {
+                    iconContainer.innerHTML = `
+                        <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+                    `;
+                }
+            } else {
+                btn.classList.remove('speaking');
+                textSpan.innerText = "Dengarkan Penjelasan";
+                if (iconContainer) {
+                    iconContainer.innerHTML = `
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    `;
+                }
+            }
+        }
 
         function playBeep(freq = 440, type = 'sine', duration = 0.1) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -174,7 +364,7 @@
             osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(masterGain);
             osc.start();
             gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
             osc.stop(audioCtx.currentTime + duration);
@@ -200,7 +390,7 @@
             filter.frequency.setValueAtTime(100, audioCtx.currentTime);
             rumbleOsc.connect(filter);
             filter.connect(rumbleGain);
-            rumbleGain.connect(audioCtx.destination);
+            rumbleGain.connect(masterGain);
             rumbleOsc.start();
         }
 

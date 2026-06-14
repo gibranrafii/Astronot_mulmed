@@ -7,6 +7,16 @@ function startAdventure() {
     playBeep(600, 'square', 0.1);
     document.getElementById('phase-landing').classList.replace('active', 'hidden');
     document.getElementById('phase-a').classList.replace('hidden', 'active');
+    
+    // Tampilkan tombol mute dan jalankan backsound secara otomatis
+    isAdventureStarted = true;
+    const muteBtn = document.getElementById('mute-btn');
+    if (muteBtn) {
+        muteBtn.classList.remove('hidden-btn');
+    }
+    if (typeof playBgMusic === 'function') {
+        playBgMusic();
+    }
 }
 
 function goToPhase(phase) {
@@ -24,17 +34,6 @@ function goToPhase(phase) {
     if (phase === 'b') {
         setupDragToLaunch();
     }
-    
-    // Putar backsound hanya saat di fase C
-    const bgMusic = document.getElementById('bg-music');
-    if (bgMusic) {
-        if (phase === 'c') {
-            bgMusic.play().catch(e => console.log('Audio autoplay blocked', e));
-        } else {
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-        }
-    }
 }
 
 // --- Fase A: Persiapan ---
@@ -44,10 +43,24 @@ function showDressUp() {
     document.getElementById('dressup-section').classList.remove('hidden');
 }
 
+let toastTimeout;
+function showToast(message) {
+    const toast = document.getElementById('toast-notification');
+    if (!toast) return;
+    toast.innerText = message;
+    toast.classList.add('show');
+    playBeep(300, 'square', 0.1);
+    
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
 function dragItem(ev, type) {
     if (type === 'helmet' && !isSuitEquipped) {
         ev.preventDefault();
-        alert("Harap pakaikan baju luar angkasa (Space Suit) terlebih dahulu sebelum memakai helm!");
+        showToast("⚠️ Harap pakaikan baju luar angkasa (Space Suit) terlebih dahulu!");
         return;
     }
     ev.dataTransfer.setData("type", type);
@@ -144,6 +157,10 @@ function drag(e) {
         currentY = diff;
         rocket.style.transform = `translateY(${currentY}px)`;
         
+        // Tampilkan api saat sedang di-drag ke atas
+        const rocketFire = document.getElementById('rocket-fire');
+        if (rocketFire) rocketFire.classList.remove('hidden');
+        
         // If dragged high enough, trigger launch sequence!
         if (currentY < -150) {
             isDragging = false;
@@ -155,6 +172,10 @@ function drag(e) {
 function endDrag() {
     if (!isDragging) return;
     isDragging = false;
+    
+    // Sembunyikan api karena dilepas sebelum meluncur
+    const rocketFire = document.getElementById('rocket-fire');
+    if (rocketFire) rocketFire.classList.add('hidden');
     
     // Spring back if not dragged high enough
     rocket.style.transition = 'transform 0.3s ease-out';
@@ -172,6 +193,9 @@ function triggerLaunch() {
     rocket.style.transform = `translateY(${currentY}px)`;
     
     launchInstruction.innerText = "Sistem peluncuran aktif!";
+    
+    const dragInd = document.getElementById('drag-indicator');
+    if (dragInd) dragInd.classList.add('hidden');
     
     // Start sequence
     startCountdown();
@@ -224,38 +248,45 @@ function startCountdown() {
 const activityData = {
     sleep: {
         title: "Tidur Melayang",
-        desc: "Di gravitasi nol, semuanya melayang! Astronot tidur di kantung tidur yang diikat ke dinding agar tidak melayang menabrak alat-alat saat tidur.",
-        video: "https://www.youtube.com/embed/UyFYgeE32f0"
+        desc: "Wah, bayangkan tidur sambil melayang-layang seperti balon! 🎈 Di luar angkasa tidak ada gravitasi (gaya tarik Bumi), jadi astronot harus tidur di dalam kantung tidur khusus yang ditempelkan erat ke dinding. Mengapa harus diikat? Supaya saat tertidur lelap, astronot tidak melayang dan menabrak peralatan sensitif atau astronot lainnya! Pintu kamarnya juga ditutup rapat agar suasananya tenang dan nyaman.",
+        video: "https://www.youtube.com/embed/UyFYgeE32f0",
+        voice: "voice_over/tidur.mp3"
     },
     eat: {
         title: "Makan di Luar Angkasa",
-        desc: "Makanan astronot kebanyakan dikeringkan atau ditaruh dalam kemasan khusus. Air juga membentuk bola-bola air yang melayang di udara!",
-        video: "https://www.youtube.com/embed/onm7P_iFueE"
+        desc: "Nyam, bagaimana rasanya makan makanan yang melayang? 🍕 Makanan di luar angkasa dikemas khusus dalam wadah plastik atau kaleng, bahkan ada yang dikeringkan agar tahan lama. Jika astronot menuangkan air, airnya tidak akan jatuh ke bawah, melainkan membentuk bola-bola air gelembung yang melayang manis! Astronot harus menangkap bola air itu langsung dengan mulut mereka. Seru sekali, kan? Tidak boleh makan makanan yang renyah seperti keripik, ya, karena remah-remahnya bisa melayang masuk ke mata atau merusak mesin roket!",
+        video: "https://www.youtube.com/embed/onm7P_iFueE",
+        voice: "voice_over/makan.mp3"
     },
     wash: {
         title: "Toilet Luar Angkasa",
-        desc: "Tanpa gravitasi, astronot menggunakan toilet khusus yang bekerja seperti penyedot debu (vacuum) untuk menghisap kotoran agar tidak melayang-layang di udara!",
-        video: "https://www.youtube.com/embed/3VoeRAR0YgE"
+        desc: "Bagaimana astronot buang air di luar angkasa? 🚽 Karena tidak ada gravitasi, toilet di stasiun antariksa (ISS) bekerja menggunakan daya hisap angin seperti penyedot debu raksasa! Jika tidak disedot, kotorannya bisa melayang ke mana-mana, lho! Hiiy... seram sekali! Jadi, toiletnya didesain sangat canggih dan pas dengan tubuh astronot agar tetap bersih, higienis, dan nyaman selama bertugas.",
+        video: "https://www.youtube.com/embed/aCG8NPh5G5w",
+        voice: "voice_over/toilet.mp3"
     },
     spacewalk: {
         title: "Space Walk (EVA)",
-        desc: "Terkadang astronot harus keluar dari ISS untuk memperbaiki satelit. Mereka diikat dengan tali pengaman agar tidak melayang jauh ke angkasa.",
-        video: "https://www.youtube.com/embed/CC-z_aBAv6M"
+        desc: "Melompat dan berjalan di tengah kegelapan luar angkasa yang luas! 👨‍🚀 Kegiatan ini disebut Spacewalk. Astronot harus memakai baju luar angkasa lengkap yang tebal sebagai pelindung dari suhu dingin ekstrem dan radiasi berbahaya. Mereka keluar dari stasiun luar angkasa untuk memperbaiki alat atau memasang panel surya baru. Agar tidak melayang hanyut dan tersesat di luar angkasa yang tak terbatas, tubuh astronot selalu diikat dengan tali pengaman baja yang sangat kuat!",
+        video: "https://www.youtube.com/embed/CC-z_aBAv6M",
+        voice: "voice_over/spacewalk.mp3"
     },
     panoramic: {
         title: "Pemandangan Bumi",
-        desc: "Dari jarak 400 kilometer di atas Bumi, astronot bisa melihat lengkungan planet kita yang indah. Bumi terlihat dominan berwarna biru (air) dengan awan putih yang berputar.",
-        video: "https://www.youtube.com/embed/uYpRRInfi80"
+        desc: "Melihat Bumi kita yang bulat, biru, dan indah dari jendela luar angkasa! 🌍 Dari stasiun luar angkasa ISS yang berada 400 kilometer di atas langit, astronot bisa memandang lengkungan Bumi yang megah. Bumi tampak bersinar dengan warna biru laut yang luas, benua-benua hijau kecokelatan, dan pusaran awan putih yang cantik bagaikan lukisan raksasa yang bergerak lambat. Sungguh pemandangan menakjubkan!",
+        video: "https://www.youtube.com/embed/uYpRRInfi80",
+        voice: "voice_over/pemandangan-bumi.mp3"
     },
     swimming: {
         title: "Latihan Simulasi Air",
-        desc: "Latihan berjam-jam di bawah air menggunakan baju astronot lengkap agar terbiasa dengan gaya berat angkat.",
-        video: "https://www.youtube.com/embed/4514z--Zbfk"
+        desc: "Sebelum terbang ke langit, astronot harus berlatih menyelam di kolam raksasa bernama NBL (Neutral Buoyancy Laboratory)! 🏊‍♂️ Kolam ini sangat dalam dan berisi replika stasiun luar angkasa. Di dalam air dengan baju astronot lengkap seberat 100 kg lebih, mereka merasa hampir tanpa bobot—sangat mirip seperti melayang di luar angkasa! Mereka belajar bergerak lambat, menggunakan peralatan canggih, dan bekerja sama di bawah air selama berjam-jam agar tidak kaget saat di antariksa nanti.",
+        video: "https://www.youtube.com/embed/4514z--Zbfk",
+        voice: "voice_over/simulasi-air.mp3"
     },
     centrifugal: {
         title: "Latihan Sentrifugal",
-        desc: "Diputar dengan sangat cepat untuk menahan tekanan peluncuran roket.",
-        video: "https://www.youtube.com/embed/xJyBIUNlY2M"
+        desc: "Siap-siap berputar super cepat! 🌀 Latihan sentrifugal ini menggunakan mesin berbentuk lengan raksasa yang memutar astronot dengan kecepatan sangat tinggi di dalam ruangan bulat. Putaran cepat ini menghasilkan gaya tekan yang sangat kuat, mirip dengan tekanan berat (G-Force) yang dirasakan dada astronot saat roket meluncur menembus langit. Latihan ini melatih jantung dan pernapasan astronot agar tetap sadar dan sehat meskipun tertindih tekanan yang berat!",
+        video: "https://www.youtube.com/embed/xJyBIUNlY2M",
+        voice: "voice_over/sentrifugal.mp3"
     }
 };
 
@@ -265,6 +296,14 @@ function showActivity(type) {
     document.getElementById('act-title').innerHTML = data.title;
     document.getElementById('act-desc').innerHTML = data.desc;
     
+    // Set path audio voice over kustom
+    window.currentVoicePath = data.voice;
+    
+    // Hentikan voice over jika masih berjalan dari aktivitas sebelumnya
+    if (typeof stopVoiceOver === 'function') {
+        stopVoiceOver();
+    }
+    
     // Set iframe
     const container = document.getElementById('video-container');
     container.innerHTML = `<iframe width="100%" height="100%" src="${data.video}?autoplay=1&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
@@ -273,6 +312,11 @@ function showActivity(type) {
 }
 
 function closeActivity() {
+    // Hentikan voice over saat modal ditutup
+    if (typeof stopVoiceOver === 'function') {
+        stopVoiceOver();
+    }
+    
     // Hapus iframe agar video berhenti memutar
     document.getElementById('video-container').innerHTML = '';
     document.getElementById('activity-modal').classList.add('hidden');

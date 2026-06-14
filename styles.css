@@ -528,7 +528,7 @@ h1, h2, h3 {
 .icon-panoramic { top: 45%; right: 8%; animation-delay: 2s; }
 
 #phase-c {
-    background-image: url('assets/iss_hd.png');
+    background-image: url('assets/iss_HD.png');
     background-size: cover;
     background-position: center;
 }
